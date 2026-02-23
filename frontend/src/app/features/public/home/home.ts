@@ -1,9 +1,13 @@
-import { Component, signal, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { HotelService, Hotel } from '../../../core/services/hotel.service';
+import { FormsModule } from '@angular/forms';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  standalone: true,
+  imports: [RouterLink, FormsModule, CommonModule, NgOptimizedImage],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Hero Section (Carousel) -->
@@ -45,11 +49,22 @@ import { RouterLink } from '@angular/router';
       <div class="relative z-10 text-center text-white px-4 animate-fade-in-up max-w-4xl">
         <p class="text-gold-400 uppercase tracking-widest mb-4 font-medium">Welcome to Luxury</p>
         <h1 class="text-5xl md:text-7xl font-serif font-bold mb-6 tracking-tight drop-shadow-lg">
-          The Royal <span class="text-gold-400">Hotel</span>
+          The Royal <span class="text-gold-400">Hotels</span>
         </h1>
-        <p class="text-xl md:text-2xl mb-8 font-light max-w-2xl mx-auto drop-shadow-md text-gray-100">
-          Experience the epitome of luxury and comfort in the heart of paradise. Where every moment becomes a cherished memory.
-        </p>
+        
+        <!-- Search Bar -->
+        <div class="max-w-2xl mx-auto bg-white/10 backdrop-blur-md p-2 rounded-full border border-white/20 shadow-2xl mb-8 flex items-center">
+            <input 
+              type="text" 
+              [(ngModel)]="searchCity" 
+              placeholder="Search by city (e.g. Mumbai, Goa, Delhi)..." 
+              class="flex-grow bg-transparent border-none text-white placeholder-gray-300 px-6 py-3 focus:outline-none text-lg"
+            >
+            <button (click)="searchHotels()" class="bg-gold-600 hover:bg-gold-700 text-white px-8 py-3 rounded-full font-bold transition">
+              Search
+            </button>
+        </div>
+
         <div class="flex flex-col md:flex-row gap-4 justify-center">
           <a routerLink="/booking" class="px-8 py-4 bg-gold-600 text-white rounded-full font-medium hover:bg-gold-700 transition transform hover:scale-105 shadow-lg text-lg">
             Book Your Stay
@@ -60,6 +75,81 @@ import { RouterLink } from '@angular/router';
         </div>
       </div>
     </section>
+
+    <!-- Explore Our Locations Section -->
+    <section class="py-20 bg-white dark:bg-gray-950">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <p class="text-gold-600 uppercase tracking-widest mb-2 font-medium">Top Destinations</p>
+          <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 dark:text-white mb-4">Explore Our Locations</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          @for (city of cities(); track city.name) {
+            <a [routerLink]="['/hotels']" [queryParams]="{ city: city.name }" class="relative h-[480px] rounded-2xl overflow-hidden shadow-lg cursor-pointer group block border-2 border-transparent hover:border-gold-400 transition-all duration-500">
+              <img [ngSrc]="city.image" [alt]="city.name" fill priority class="object-cover transform group-hover:scale-110 transition duration-700">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+              
+              <div class="absolute bottom-0 left-0 p-8 w-full transform group-hover:translate-y-[-10px] transition-transform duration-500">
+                <div class="flex items-center gap-2 text-gold-400 text-xs font-bold uppercase tracking-widest mb-3">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Top Rated</span>
+                </div>
+                <h3 class="text-3xl font-serif font-bold text-white mb-2">{{ city.name }}</h3>
+                <p class="text-gray-300 text-sm mb-6 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    {{ city.hotelsCount }}+ Luxury Hotels Available
+                </p>
+                <div class="flex gap-3">
+                    <div class="flex-1 bg-gold-600 text-white text-center text-xs font-bold py-3 rounded-xl transition uppercase tracking-wider group-hover:bg-gold-700 shadow-lg">
+                        View Hotels
+                    </div>
+                    <div class="flex-1 bg-white/10 backdrop-blur-md border border-white/30 text-white text-center text-xs font-bold py-3 rounded-xl transition uppercase tracking-wider hover:bg-white/20">
+                        Book Stay
+                    </div>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Hotels at Selection -->
+    @if (targetHotels().length > 0) {
+      <section id="hotels-results" class="py-20 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 dark:text-white mb-4">Featured Hotels in {{ currentFilter() || 'All Cities' }}</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @for (hotel of targetHotels(); track hotel._id) {
+              <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition group flex flex-col h-full">
+                <div class="h-64 overflow-hidden relative">
+                  <img [src]="hotel.imagePath" [alt]="hotel.name" class="w-full h-full object-cover">
+                  <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                    <span class="text-gold-600 font-bold">{{ hotel.stars }}</span>
+                    <i class="fas fa-star text-gold-500 text-xs"></i>
+                  </div>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                  <p class="text-gold-600 text-sm font-bold uppercase tracking-wider mb-2">{{ hotel.city }}</p>
+                  <h3 class="text-2xl font-serif font-bold mb-3 dark:text-white">{{ hotel.name }}</h3>
+                  <p class="text-gray-600 dark:text-gray-300 mb-6 flex-grow line-clamp-3">{{ hotel.description }}</p>
+                  <div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mt-auto">
+                    <span class="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt text-gold-600"></i> {{ hotel.address }}
+                    </span>
+                    <a [routerLink]="['/rooms']" [queryParams]="{ hotelId: hotel._id }" class="text-gold-600 font-bold hover:text-gold-700">View Rooms</a>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    }
 
     <!-- Features Strip -->
     <section class="bg-gray-900 dark:bg-black py-6">
@@ -214,9 +304,17 @@ import { RouterLink } from '@angular/router';
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   `
 })
 export class Home implements OnInit, OnDestroy {
+  private hotelService = inject(HotelService);
+
   sliderImages = signal([
     { url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070', title: 'Luxury Hotel Exterior' },
     { url: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070', title: 'Presidential Suite' },
@@ -225,19 +323,52 @@ export class Home implements OnInit, OnDestroy {
     { url: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070', title: 'Ocean View Room' }
   ]);
 
+  cities = signal([
+    { name: 'Mumbai', hotelsCount: 25, image: 'https://images.unsplash.com/photo-1566552881560-0be862a7c445?q=80&w=1600' },
+    { name: 'Goa', hotelsCount: 25, image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1600' },
+    { name: 'Delhi', hotelsCount: 25, image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=1600' },
+    { name: 'Bangalore', hotelsCount: 25, image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=1600' }
+  ]);
+
   currentSlide = signal(0);
+  searchCity = '';
+  currentFilter = signal('');
+  targetHotels = signal<Hotel[]>([]);
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit() {
     this.intervalId = setInterval(() => {
       this.nextSlide();
     }, 5000);
+    this.loadAllHotels();
   }
 
   ngOnDestroy() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  }
+
+  loadAllHotels() {
+    this.hotelService.getHotels().subscribe(hotels => {
+      this.targetHotels.set(hotels.slice(0, 3)); // Featured
+    });
+  }
+
+  searchHotels() {
+    if (!this.searchCity.trim()) return;
+    this.filterByCity(this.searchCity);
+  }
+
+  filterByCity(city: string) {
+    this.currentFilter.set(city);
+    this.hotelService.getHotels(city).subscribe(hotels => {
+      this.targetHotels.set(hotels);
+      const resultsSection = document.getElementById('hotels-results');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
   }
 
   nextSlide() {

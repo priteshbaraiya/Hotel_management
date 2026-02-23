@@ -23,6 +23,8 @@ app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/services', require('./routes/serviceRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/settings', require('./routes/settingRoutes'));
+app.use('/api/hotels', require('./routes/hotelRoutes'));
+app.use('/api/chat', require('./routes/chatRoutes'));
 
 // Database Connection
 mongoose.connect(MONGO_URI)

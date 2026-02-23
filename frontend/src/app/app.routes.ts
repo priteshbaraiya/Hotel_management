@@ -5,6 +5,7 @@ import { Rooms } from './features/public/rooms/rooms';
 import { Booking } from './features/public/booking/booking';
 import { Gallery } from './features/public/gallery/gallery';
 import { Offers } from './features/public/offers/offers';
+import { Hotels } from './features/public/hotels/hotels';
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
 import { GuestLayout } from './features/guest/layout/guest-layout/guest-layout';
@@ -26,9 +27,10 @@ export const routes: Routes = [
     { path: '', component: Home },
     { path: 'services', component: Services },
     { path: 'rooms', component: Rooms },
-    { path: 'booking', component: Booking },
+    { path: 'booking', component: Booking, canActivate: [roleGuard(['guest', 'admin'])] },
     { path: 'gallery', component: Gallery },
     { path: 'offers', component: Offers },
+    { path: 'hotels', component: Hotels },
     { path: 'login', component: Login },
     { path: 'register', component: Register },
     { path: 'forgot-password', loadComponent: () => import('./features/auth/forgot-password/forgot-password').then(m => m.ForgotPassword) },

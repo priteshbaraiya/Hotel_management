@@ -24,6 +24,7 @@ import { ThemeService } from '../../../core/services/theme.service';
           <div class="hidden lg:flex items-center space-x-6">
             <a routerLink="/" routerLinkActive="text-gold-600" [routerLinkActiveOptions]="{exact: true}" class="text-gray-700 hover:text-gold-600 font-medium transition">Home</a>
             <a routerLink="/rooms" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition">Rooms</a>
+            <a routerLink="/hotels" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition">Hotels</a>
             <a routerLink="/services" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition">Services</a>
             <a routerLink="/gallery" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition">Gallery</a>
             <a routerLink="/offers" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition">Offers</a>
@@ -132,6 +133,7 @@ import { ThemeService } from '../../../core/services/theme.service';
           <div class="flex flex-col space-y-3">
             <a routerLink="/" (click)="closeMobileMenu()" routerLinkActive="text-gold-600" [routerLinkActiveOptions]="{exact: true}" class="text-gray-700 hover:text-gold-600 font-medium transition py-2">Home</a>
             <a routerLink="/rooms" (click)="closeMobileMenu()" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition py-2">Rooms</a>
+            <a routerLink="/hotels" (click)="closeMobileMenu()" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition py-2">Hotels</a>
             <a routerLink="/services" (click)="closeMobileMenu()" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition py-2">Services</a>
             <a routerLink="/gallery" (click)="closeMobileMenu()" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition py-2">Gallery</a>
             <a routerLink="/offers" (click)="closeMobileMenu()" routerLinkActive="text-gold-600" class="text-gray-700 hover:text-gold-600 font-medium transition py-2">Offers</a>

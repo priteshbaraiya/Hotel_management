@@ -2,18 +2,20 @@ import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Navbar } from './shared/components/navbar/navbar';
 import { Footer } from './shared/components/footer/footer';
+import { ChatbotComponent } from './features/public/chatbot/chatbot';
 import { filter, map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer],
+  imports: [RouterOutlet, Navbar, Footer, ChatbotComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-navbar></app-navbar>
     <main class="min-h-screen pt-20">
       <router-outlet></router-outlet>
     </main>
+    <app-chatbot></app-chatbot>
     @if (!isDashboardRoute()) {
       <app-footer></app-footer>
     }

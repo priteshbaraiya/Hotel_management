@@ -6,7 +6,7 @@ const roomSchema = new mongoose.Schema({
     required: true
   },
   type: {
-    type: String, // e.g., 'Deluxe', 'Suite', 'Presidential'
+    type: String,
     required: true,
     default: 'Standard'
   },
@@ -17,6 +17,14 @@ const roomSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true
+  },
+  guests: {
+    type: Number,
+    default: 2
+  },
+  size: {
+    type: Number,
+    default: 300
   },
   amenities: {
     type: [String],
@@ -29,6 +37,10 @@ const roomSchema = new mongoose.Schema({
   isBooked: {
     type: Boolean,
     default: false
+  },
+  hotel: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Hotel'
   }
 });
 
